@@ -1,14 +1,15 @@
 use crate::scenarios::{
-    simple::simple, single_mutex::single_mutex, wal::wal, wal_synchronous::wal_synchronous,
-    wal_synchronous_memory::wal_synchronous_memory,
+    index::index, simple::simple, single_mutex::single_mutex, wal::wal,
+    wal_synchronous::wal_synchronous, wal_synchronous_memory::wal_synchronous_memory,
 };
 
 mod migration;
 mod scenarios;
 mod stats;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    print!("Single thread + Index: ");
+    index()?;
     print!("Single thread + Mutex: ");
     single_mutex()?;
     print!("Single thread + WAL mode + synchronous normal + in-memory: ");

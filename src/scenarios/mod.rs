@@ -1,3 +1,4 @@
+pub mod index;
 pub mod simple;
 pub mod single_mutex;
 pub mod wal;

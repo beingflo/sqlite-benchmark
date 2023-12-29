@@ -1,23 +1,17 @@
-use std::{
-    sync::Mutex,
-    time::{Instant, SystemTime},
-};
+use std::time::{Instant, SystemTime};
 
 use chrono::{DateTime, Utc};
 use rusqlite::Connection;
 
-use crate::{migration::apply_migrations, stats::Measurements};
+use crate::{migration::apply_migrations_with_index, stats::Measurements};
 
-pub fn single_mutex() -> Result<(), Box<dyn std::error::Error>> {
-    let mut conn = Mutex::new(Connection::open("./single_mutex.sqlite")?);
+pub fn index() -> Result<(), Box<dyn std::error::Error>> {
+    let mut conn = Connection::open("./index.sqlite")?;
 
-    {
-        let c = conn.lock().unwrap();
-        c.pragma_update_and_check(None, "journal_mode", &"WAL", |_| Ok(()))
-            .unwrap();
-        c.pragma_update(None, "synchronous", &"NORMAL").unwrap();
-    }
-    apply_migrations(conn.get_mut().unwrap());
+    conn.pragma_update_and_check(None, "journal_mode", &"WAL", |_| Ok(()))
+        .unwrap();
+    conn.pragma_update(None, "synchronous", &"NORMAL").unwrap();
+    apply_migrations_with_index(&mut conn);
 
     let mut measurements = Measurements::new();
 
@@ -34,8 +28,6 @@ pub fn single_mutex() -> Result<(), Box<dyn std::error::Error>> {
 
         let before = Instant::now();
         let result = conn
-            .lock()
-            .unwrap()
             .execute(
                 "INSERT INTO metrics (bucket, date, data) VALUES (?1, ?2, ?3)",
                 (bucket, date, data),
