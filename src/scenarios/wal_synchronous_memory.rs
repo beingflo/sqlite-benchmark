@@ -5,7 +5,7 @@ use rusqlite::Connection;
 
 use crate::{migration::apply_migrations, stats::Measurements};
 
-pub fn wal_synchronous_memory() -> Result<(), Box<dyn std::error::Error>> {
+pub fn wal_synchronous_memory() -> Result<Connection, Box<dyn std::error::Error>> {
     let mut conn = Connection::open_in_memory()?;
 
     conn.pragma_update_and_check(None, "journal_mode", &"WAL", |_| Ok(()))
@@ -15,7 +15,7 @@ pub fn wal_synchronous_memory() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut measurements = Measurements::new();
 
-    let num_iterations = 100000;
+    let num_iterations = 20000;
 
     let mut counter = 0;
     while counter < num_iterations {
@@ -45,5 +45,5 @@ pub fn wal_synchronous_memory() -> Result<(), Box<dyn std::error::Error>> {
 
     measurements.print_results();
 
-    Ok(())
+    Ok(conn)
 }
