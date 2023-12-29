@@ -2,7 +2,8 @@ use std::fs;
 
 use crate::scenarios::{
     index::index, simple::simple, simple_read::simple_read, single_mutex::single_mutex, wal::wal,
-    wal_synchronous::wal_synchronous, wal_synchronous_memory::wal_synchronous_memory,
+    wal_read::wal_read, wal_synchronous::wal_synchronous,
+    wal_synchronous_memory::wal_synchronous_memory,
 };
 
 mod migration;
@@ -10,6 +11,13 @@ mod scenarios;
 mod stats;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Single Thread
+    print!("Single thread + WAL mode: ");
+    wal()?;
+    print!("Single thread + WAL mode read: ");
+    wal_read()?;
+    fs::remove_file("./wal.sqlite")?;
+
     print!("Single thread: ");
     simple()?;
     print!("Single thread read: ");
@@ -18,8 +26,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     return Ok(());
 
-    // Single Thread
-    // WRITE
     print!("Single thread + Index: ");
     index()?;
     print!("Single thread + Mutex: ");
@@ -28,11 +34,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     wal_synchronous_memory()?;
     print!("Single thread + WAL mode + synchronous normal: ");
     wal_synchronous()?;
-    print!("Single thread + WAL mode: ");
-    wal()?;
-    print!("Single thread: ");
-    simple()?;
-    // READ
-
     Ok(())
 }

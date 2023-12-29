@@ -14,7 +14,7 @@ pub fn wal() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut measurements = Measurements::new();
 
-    let num_iterations = 100000;
+    let num_iterations = 20000;
 
     let mut counter = 0;
     while counter < num_iterations {
