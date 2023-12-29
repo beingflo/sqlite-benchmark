@@ -1,11 +1,13 @@
-use std::time::{Instant, SystemTime};
+use std::time::Instant;
 
-use chrono::{DateTime, Utc};
 use rusqlite::Connection;
 
-use crate::{migration::apply_migrations, stats::Measurements};
+use crate::{
+    migration::{apply_migrations, Entry},
+    stats::Measurements,
+};
 
-pub fn wal_synchronous() -> Result<(), Box<dyn std::error::Error>> {
+pub fn wal_synchronous_read() -> Result<(), Box<dyn std::error::Error>> {
     let mut conn = Connection::open("./wal-synchronous.sqlite")?;
 
     conn.pragma_update_and_check(None, "journal_mode", &"WAL", |_| Ok(()))
@@ -15,30 +17,33 @@ pub fn wal_synchronous() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut measurements = Measurements::new();
 
-    let num_iterations = 20000;
+    let num_iterations = 1000;
+
+    let mut stmt = conn
+        .prepare("SELECT * FROM metrics WHERE bucket = ?1 ORDER BY date")
+        .unwrap();
 
     let mut counter = 0;
     while counter < num_iterations {
         let bucket: String = "test".into();
 
-        let now = SystemTime::now();
-        let now: DateTime<Utc> = now.into();
-        let date = now.to_rfc3339();
-        let data: String = "data".into();
-
         let before = Instant::now();
-        let result = conn
-            .execute(
-                "INSERT INTO metrics (bucket, date, data) VALUES (?1, ?2, ?3)",
-                (bucket, date, data),
-            )
+
+        let rows = stmt
+            .query_and_then([bucket], |row| -> Result<Entry, rusqlite::Error> {
+                Ok(Entry {
+                    bucket: row.get(0).unwrap(),
+                    date: row.get(1).unwrap(),
+                    data: row.get(2).unwrap(),
+                })
+            })
             .unwrap();
+
+        assert!(rows.count() >= 100);
         let after = Instant::now();
 
         let duration = after - before;
         measurements.insert(duration.as_micros());
-
-        assert_eq!(result, 1);
 
         counter += 1;
     }
