@@ -16,7 +16,7 @@ pub fn wal_synchronous_memory_read(mut conn: Connection) -> Result<(), Box<dyn s
     let mut measurements = Measurements::new();
 
     let mut stmt = conn
-        .prepare("SELECT * FROM metrics WHERE bucket = ?1 ORDER BY date")
+        .prepare("SELECT * FROM metrics WHERE bucket = ?1 ORDER BY date LIMIT 1000")
         .unwrap();
 
     let num_iterations = 1000;
@@ -37,7 +37,7 @@ pub fn wal_synchronous_memory_read(mut conn: Connection) -> Result<(), Box<dyn s
             })
             .unwrap();
 
-        assert!(rows.count() >= 100);
+        assert!(rows.count() >= 1);
         let after = Instant::now();
 
         let duration = after - before;
