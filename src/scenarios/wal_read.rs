@@ -25,7 +25,7 @@ pub fn wal_read() -> Result<(), Box<dyn std::error::Error>> {
     let mut counter = 0;
     while counter < num_iterations {
         let bucket: String = "test".into();
-        let random = rand::random::<u32>() % 20000;
+        let random = (rand::random::<u32>() % 20000) + 1;
 
         let before = Instant::now();
 

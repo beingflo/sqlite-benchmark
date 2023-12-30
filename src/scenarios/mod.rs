@@ -1,4 +1,5 @@
 pub mod index;
+pub mod index_mixed;
 pub mod index_read;
 pub mod simple;
 pub mod simple_read;

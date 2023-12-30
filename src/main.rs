@@ -1,9 +1,9 @@
 use std::fs;
 
 use crate::scenarios::{
-    index::index, index_read::index_read, simple::simple, simple_read::simple_read,
-    single_mutex::single_mutex, wal::wal, wal_read::wal_read, wal_synchronous::wal_synchronous,
-    wal_synchronous_memory::wal_synchronous_memory,
+    index::index, index_mixed::index_mixed, index_read::index_read, simple::simple,
+    simple_read::simple_read, single_mutex::single_mutex, wal::wal, wal_read::wal_read,
+    wal_synchronous::wal_synchronous, wal_synchronous_memory::wal_synchronous_memory,
     wal_synchronous_memory_read::wal_synchronous_memory_read,
     wal_synchronous_read::wal_synchronous_read,
 };
@@ -14,6 +14,13 @@ mod stats;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Single Thread
+    print!("Single thread + Index mixed read heavy: ");
+    index_mixed(false)?;
+    fs::remove_file("./index_mixed.sqlite")?;
+    print!("Single thread + Index mixed write heavy: ");
+    index_mixed(true)?;
+    fs::remove_file("./index_mixed.sqlite")?;
+
     print!("Single thread + Index: ");
     index()?;
     print!("Single thread + Index read: ");
@@ -45,6 +52,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     print!("Single thread + Mutex: ");
     single_mutex()?;
+    fs::remove_file("./single_mutex.sqlite")?;
 
     Ok(())
 }

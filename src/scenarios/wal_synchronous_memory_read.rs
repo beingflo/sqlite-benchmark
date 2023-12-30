@@ -24,7 +24,7 @@ pub fn wal_synchronous_memory_read(mut conn: Connection) -> Result<(), Box<dyn s
     let mut counter = 0;
     while counter < num_iterations {
         let bucket: String = "test".into();
-        let random = rand::random::<u32>() % 20000;
+        let random = (rand::random::<u32>() % 20000) + 1;
 
         let before = Instant::now();
 
