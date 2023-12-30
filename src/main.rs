@@ -5,7 +5,7 @@ use crate::scenarios::{
     simple_read::simple_read, single_mutex::single_mutex, wal::wal, wal_read::wal_read,
     wal_synchronous::wal_synchronous, wal_synchronous_memory::wal_synchronous_memory,
     wal_synchronous_memory_read::wal_synchronous_memory_read,
-    wal_synchronous_read::wal_synchronous_read,
+    wal_synchronous_multi::wal_synchronous_multi, wal_synchronous_read::wal_synchronous_read,
 };
 
 mod migration;
@@ -13,6 +13,12 @@ mod scenarios;
 mod stats;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    print!("Single thread + WAL mode + synchronous normal: ");
+    wal_synchronous()?;
+    print!("Multi thread + WAL mode + synchronous normal: ");
+    wal_synchronous_multi()?;
+    fs::remove_file("./wal-synchronous.sqlite")?;
+
     // Single Thread
     print!("Single thread + Index mixed read heavy: ");
     index_mixed(false)?;

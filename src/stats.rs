@@ -1,10 +1,19 @@
 pub struct Measurements {
-    data: Vec<u128>,
+    pub data: Vec<u128>,
 }
 
 impl Measurements {
     pub fn new() -> Measurements {
         Measurements { data: vec![] }
+    }
+
+    pub fn from_slice(mut measurements: Vec<Measurements>) -> Measurements {
+        let mut data = vec![];
+        measurements
+            .iter_mut()
+            .for_each(|m| data.append(&mut m.data));
+
+        Measurements { data: data }
     }
 
     pub fn insert(&mut self, datum: u128) {

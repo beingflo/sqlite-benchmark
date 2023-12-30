@@ -9,4 +9,5 @@ pub mod wal_read;
 pub mod wal_synchronous;
 pub mod wal_synchronous_memory;
 pub mod wal_synchronous_memory_read;
+pub mod wal_synchronous_multi;
 pub mod wal_synchronous_read;
