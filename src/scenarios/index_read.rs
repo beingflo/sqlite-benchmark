@@ -20,26 +20,30 @@ pub fn index_read() -> Result<(), Box<dyn std::error::Error>> {
     let num_iterations = 1000;
 
     let mut stmt = conn
-        .prepare("SELECT * FROM metrics WHERE bucket = ?1 ORDER BY date LIMIT 1000")
+        .prepare("SELECT * FROM metrics WHERE bucket = ?1 AND rowid = ?2;")
         .unwrap();
 
     let mut counter = 0;
     while counter < num_iterations {
         let bucket: String = "test".into();
+        let random = rand::random::<u32>() % 20000;
 
         let before = Instant::now();
 
         let rows = stmt
-            .query_and_then([bucket], |row| -> Result<Entry, rusqlite::Error> {
-                Ok(Entry {
-                    bucket: row.get(0).unwrap(),
-                    date: row.get(1).unwrap(),
-                    data: row.get(2).unwrap(),
-                })
-            })
+            .query_and_then(
+                [bucket, random.to_string()],
+                |row| -> Result<Entry, rusqlite::Error> {
+                    Ok(Entry {
+                        bucket: row.get(0).unwrap(),
+                        date: row.get(1).unwrap(),
+                        data: row.get(2).unwrap(),
+                    })
+                },
+            )
             .unwrap();
 
-        assert!(rows.count() > 1);
+        assert!(rows.count() >= 1);
         let after = Instant::now();
 
         let duration = after - before;
