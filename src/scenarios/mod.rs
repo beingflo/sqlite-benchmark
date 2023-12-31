@@ -1,6 +1,7 @@
 pub mod index;
 pub mod index_mixed;
 pub mod index_read;
+pub mod multi;
 pub mod simple;
 pub mod simple_read;
 pub mod single_mutex;

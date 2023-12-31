@@ -1,7 +1,7 @@
 use std::fs;
 
 use crate::scenarios::{
-    index::index, index_mixed::index_mixed, index_read::index_read, simple::simple,
+    index::index, index_mixed::index_mixed, index_read::index_read, multi::multi, simple::simple,
     simple_read::simple_read, single_mutex::single_mutex, wal::wal, wal_read::wal_read,
     wal_synchronous::wal_synchronous, wal_synchronous_memory::wal_synchronous_memory,
     wal_synchronous_memory_read::wal_synchronous_memory_read,
